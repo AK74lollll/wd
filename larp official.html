@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Super Cool Larps</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(0, 162, 255, 0.18), transparent 25%),
+        radial-gradient(circle at top right, rgba(0, 162, 255, 0.12), transparent 25%),
+        radial-gradient(circle at bottom center, rgba(0, 162, 255, 0.10), transparent 35%),
+        linear-gradient(135deg, #020814, #071221, #0a1730);
+      color: white;
+      overflow-x: hidden;
+      padding: 30px;
+    }
+
+    /* LOADING SCREEN */
+    #loader {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #020814, #071221, #0a1730);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+
+    #loader.hide {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .loader-title {
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: white;
+      text-shadow:
+        0 0 12px rgba(0, 162, 255, 0.8),
+        0 0 30px rgba(0, 162, 255, 0.4);
+      margin-bottom: 20px;
+      animation: pulseGlow 1.5s infinite alternate;
+    }
+
+    .loader-bar {
+      width: 280px;
+      height: 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      overflow: hidden;
+      border: 1px solid rgba(0,162,255,0.2);
+      box-shadow: 0 0 20px rgba(0,162,255,0.1);
+    }
+
+    .loader-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #00a2ff, #005dff, #00c6ff);
+      border-radius: 999px;
+      box-shadow: 0 0 20px rgba(0,162,255,0.6);
+      animation: loadBar 2.4s ease forwards;
+    }
+
+    .loader-sub {
+      margin-top: 14px;
+      color: #bfe9ff;
+      opacity: 0.9;
+    }
+
+    @keyframes loadBar {
+      to { width: 100%; }
+    }
+
+    @keyframes pulseGlow {
+      from { transform: scale(1); }
+      to { transform: scale(1.03); }
+    }
+
+    /* BACKGROUND PARTICLES */
+    .particles {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: rgba(0, 162, 255, 0.85);
+      box-shadow: 0 0 12px rgba(0, 162, 255, 0.8);
+      animation: floatParticle linear infinite;
+    }
+
+    @keyframes floatParticle {
+      from {
+        transform: translateY(100vh) scale(0.7);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      to {
+        transform: translateY(-10vh) scale(1.2);
+        opacity: 0;
+      }
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1350px;
+      margin: auto;
+    }
+
+    .main-card {
+      background: rgba(8, 20, 40, 0.72);
+      border: 1px solid rgba(0, 162, 255, 0.22);
+      border-radius: 28px;
+      padding: 30px;
+      backdrop-filter: blur(16px);
+      box-shadow:
+        0 0 40px rgba(0, 162, 255, 0.12),
+        0 0 80px rgba(0, 162, 255, 0.06),
+        inset 0 0 30px rgba(255,255,255,0.02);
+      overflow: hidden;
+    }
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .title-wrap {
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .title {
+      font-size: 3rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+      color: #fff;
+      text-shadow:
+        0 0 10px rgba(0, 162, 255, 0.7),
+        0 0 25px rgba(0, 162, 255, 0.45),
+        0 0 45px rgba(0, 162, 255, 0.25);
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      color: #bfe9ff;
+      opacity: 0.9;
+      font-size: 1rem;
+    }
+
+    .header-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .glow-btn {
+      background: linear-gradient(135deg, #00a2ff, #005dff);
+      color: white;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.25s ease;
+      box-shadow:
+        0 0 18px rgba(0, 162, 255, 0.35),
+        inset 0 0 10px rgba(255,255,255,0.15);
+    }
+
+    .glow-btn:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow:
+        0 0 22px rgba(0, 162, 255, 0.55),
+        0 0 36px rgba(0, 162, 255, 0.18);
+    }
+
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin: 26px 0 26px;
+    }
+
+    .stat-card {
+      background: rgba(0, 132, 255, 0.08);
+      border: 1px solid rgba(0, 162, 255, 0.18);
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: 0 0 16px rgba(0, 162, 255, 0.08);
+      transition: 0.25s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 0 22px rgba(0, 162, 255, 0.18);
+    }
+
+    .stat-label {
+      color: #bfe9ff;
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 900;
+      text-shadow: 0 0 12px rgba(0,162,255,0.35);
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+
+    .tab-btn {
+      background: rgba(0, 132, 255, 0.12);
+      border: 1px solid rgba(0, 162, 255, 0.35);
+      color: white;
+      padding: 14px 22px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 800;
+      transition: 0.25s ease;
+      box-shadow: 0 0 15px rgba(0, 162, 255, 0.08);
+    }
+
+    .tab-btn:hover {
+      transform: translateY(-2px) scale(1.02);
+      background: rgba(0, 162, 255, 0.2);
+      box-shadow:
+        0 0 15px rgba(0, 162, 255, 0.3),
+        0 0 25px rgba(0, 162, 255, 0.15);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, #0099ff, #005dff);
+      border-color: rgba(255, 255, 255, 0.25);
+      box-shadow:
+        0 0 18px rgba(0, 162, 255, 0.55),
+        0 0 35px rgba(0, 162, 255, 0.25);
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.35s ease;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .section-card {
+      background: rgba(0, 132, 255, 0.08);
+      border: 1px solid rgba(0, 162, 255, 0.2);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow:
+        inset 0 0 25px rgba(0, 162, 255, 0.04),
+        0 0 20px rgba(0, 162, 255, 0.08);
+    }
+
+    .section-title {
+      font-size: 1.9rem;
+      font-weight: 900;
+      margin-bottom: 20px;
+      color: #ffffff;
+      text-shadow: 0 0 12px rgba(0, 162, 255, 0.45);
+    }
+
+    .podium {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .podium-card {
+      background: linear-gradient(135deg, rgba(0,162,255,0.16), rgba(255,255,255,0.04));
+      border: 1px solid rgba(0, 162, 255, 0.22);
+      border-radius: 22px;
+      padding: 22px;
+      box-shadow: 0 0 20px rgba(0, 162, 255, 0.08);
+      transition: 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .podium-card:hover {
+      transform: translateY(-6px) scale(1.01);
+      box-shadow:
+        0 0 24px rgba(0, 162, 255, 0.2),
+        0 0 38px rgba(0, 162, 255, 0.12);
+    }
+
+    .podium-rank {
+      font-size: 2rem;
+      font-weight: 900;
+      margin-bottom: 14px;
+      color: #fff;
+      text-shadow: 0 0 14px rgba(0,162,255,0.45);
+    }
+
+    .avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #00a2ff, #005dff);
+      font-size: 1.7rem;
+      font-weight: 900;
+      box-shadow:
+        0 0 20px rgba(0, 162, 255, 0.45),
+        inset 0 0 10px rgba(255,255,255,0.18);
+      margin-bottom: 14px;
+    }
+
+    .podium-name {
+      font-size: 1.25rem;
+      font-weight: 900;
+      margin-bottom: 6px;
+    }
+
+    .podium-note {
+      color: #cfefff;
+      opacity: 0.9;
+      margin-bottom: 10px;
+    }
+
+    .podium-score {
+      font-size: 1.4rem;
+      font-weight: 900;
+      text-shadow: 0 0 10px rgba(0,162,255,0.35);
+    }
+
+    .search-row {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .search-input, .admin-input, .admin-textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(0,162,255,0.22);
+      border-radius: 16px;
+      padding: 14px 16px;
+      color: white;
+      outline: none;
+      transition: 0.25s ease;
+      box-shadow: inset 0 0 12px rgba(0,162,255,0.04);
+    }
+
+    .search-input:focus, .admin-input:focus, .admin-textarea:focus {
+      border-color: rgba(0,162,255,0.5);
+      box-shadow:
+        0 0 18px rgba(0,162,255,0.16),
+        inset 0 0 12px rgba(0,162,255,0.08);
+    }
+
+    .search-input::placeholder,
+    .admin-input::placeholder,
+    .admin-textarea::placeholder {
+      color: #b5dfff;
+    }
+
+    .leaderboard-box {
+      max-height: 600px;
+      overflow-y: auto;
+      padding-right: 8px;
+    }
+
+    .leaderboard-box::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    .leaderboard-box::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.05);
+      border-radius: 999px;
+    }
+
+    .leaderboard-box::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #00a2ff, #006eff);
+      border-radius: 999px;
+      box-shadow: 0 0 10px rgba(0,162,255,0.5);
+    }
+
+    .leaderboard-entry {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      background: linear-gradient(90deg, rgba(0, 162, 255, 0.14), rgba(255, 255, 255, 0.03));
+      border: 1px solid rgba(0, 162, 255, 0.22);
+      border-radius: 18px;
+      padding: 18px 20px;
+      margin-bottom: 14px;
+      transition: 0.25s ease;
+      box-shadow: 0 0 12px rgba(0, 162, 255, 0.08);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .leaderboard-entry:hover {
+      transform: translateX(4px) scale(1.01);
+      box-shadow:
+        0 0 18px rgba(0, 162, 255, 0.2),
+        0 0 28px rgba(0, 162, 255, 0.12);
+      border-color: rgba(0, 162, 255, 0.4);
+    }
+
+    .entry-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .rank {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1.05rem;
+      background: linear-gradient(135deg, #00a2ff, #005dff);
+      box-shadow:
+        0 0 18px rgba(0, 162, 255, 0.45),
+        inset 0 0 8px rgba(255,255,255,0.2);
+      flex-shrink: 0;
+    }
+
+    .small-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(0,162,255,0.25);
+      font-weight: 900;
+      font-size: 1rem;
+      box-shadow: 0 0 14px rgba(0,162,255,0.15);
+      flex-shrink: 0;
+    }
+
+    .player-info {
+      min-width: 0;
+    }
+
+    .player-info h3 {
+      font-size: 1.08rem;
+      margin-bottom: 4px;
+      word-break: break-word;
+    }
+
+    .player-info p {
+      color: #bfe9ff;
+      font-size: 0.92rem;
+      opacity: 0.9;
+      word-break: break-word;
+    }
+
+    .entry-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .score {
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: #ffffff;
+      text-shadow: 0 0 10px rgba(0, 162, 255, 0.35);
+      min-width: 90px;
+      text-align: right;
+    }
+
+    .mini-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(0,162,255,0.18);
+      color: white;
+      padding: 9px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 800;
+      transition: 0.2s ease;
+    }
+
+    .mini-btn:hover {
+      background: rgba(0,162,255,0.15);
+      box-shadow: 0 0 14px rgba(0,162,255,0.16);
+    }
+
+    .danger-btn:hover {
+      background: rgba(255, 60, 60, 0.18);
+      border-color: rgba(255, 90, 90, 0.35);
+      box-shadow: 0 0 14px rgba(255, 60, 60, 0.16);
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+    }
+
+    .info-box {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(0, 162, 255, 0.18);
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: 0 0 14px rgba(0, 162, 255, 0.08);
+      transition: 0.25s ease;
+    }
+
+    .info-box:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 22px rgba(0, 162, 255, 0.16);
+    }
+
+    .info-box h3 {
+      margin-bottom: 10px;
+      color: #ffffff;
+      text-shadow: 0 0 10px rgba(0, 162, 255, 0.25);
+    }
+
+    .info-box p, .info-box a, .info-box li {
+      color: #dff6ff;
+      line-height: 1.65;
+      text-decoration: none;
+    }
+
+    .info-box a:hover {
+      color: #8fe3ff;
+      text-shadow: 0 0 10px rgba(0, 162, 255, 0.3);
+    }
+
+    ul {
+      padding-left: 18px;
+    }
+
+    .admin-panel {
+      margin-top: 22px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(0,162,255,0.16);
+      border-radius: 22px;
+      padding: 22px;
+      box-shadow: inset 0 0 16px rgba(0,162,255,0.04);
+    }
+
+    .admin-title {
+      font-size: 1.3rem;
+      font-weight: 900;
+      margin-bottom: 14px;
+      color: #fff;
+      text-shadow: 0 0 12px rgba(0,162,255,0.25);
+    }
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .admin-textarea {
+      min-height: 110px;
+      resize: vertical;
+      margin-bottom: 14px;
+    }
+
+    .footer {
+      margin-top: 28px;
+      text-align: center;
+      color: #a9ddff;
+      opacity: 0.82;
+      font-size: 0.95rem;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 860px) {
+      .title {
+        font-size: 2.2rem;
+      }
+
+      .main-card {
+        padding: 20px;
+      }
+
+      .leaderboard-entry {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .entry-right {
+        width: 100%;
+        justify-content: flex-start;
+        margin-left: 124px;
+      }
+    }
+
+    @media (max-width: 650px) {
+      body {
+        padding: 16px;
+      }
+
+      .title {
+        font-size: 1.95rem;
+      }
+
+      .entry-left {
+        align-items: flex-start;
+      }
+
+      .entry-right {
+        margin-left: 0;
+      }
+
+      .rank {
+        width: 50px;
+        height: 50px;
+      }
+
+      .small-avatar {
+        width: 46px;
+        height: 46px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOADER -->
+  <div id="loader">
+    <div class="loader-title">Super Cool Larps</div>
+    <div class="loader-bar">
+      <div class="loader-fill"></div>
+    </div>
+    <div class="loader-sub">Loading elite fraud detection...</div>
+  </div>
+
+  <!-- PARTICLES -->
+  <div class="particles" id="particles"></div>
+
+  <div class="container">
+    <div class="main-card">
+      <div class="header-row">
+        <div class="title-wrap">
+          <h1 class="title">Larp Central Official</h1>
+          <p class="subtitle">The cleanest advanced larp ranking website on earth (This is obv ragebait)</p>
+        </div>
+
+        <div class="header-controls">
+          <button class="glow-btn" onclick="toggleMusic()">🎵 Music</button>
+          <button class="glow-btn" onclick="scrollToAdmin()">⚙️ Admin</button>
+        </div>
+      </div>
+
+      <!-- FAKE LIVE STATS -->
+      <div class="stats-bar">
+        <div class="stat-card">
+          <div class="stat-label">Live Larps Detected</div>
+          <div class="stat-value" id="statLarps">20</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Online Viewers</div>
+          <div class="stat-value" id="statViewers">148</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Weekly Crashouts</div>
+          <div class="stat-value" id="statCrashouts">37</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Fraud Level</div>
+          <div class="stat-value" id="statFraud">99%</div>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div class="tabs">
+        <button class="tab-btn active" onclick="openTab('leaderboard', this)">Larp Leaderboard</button>
+        <button class="tab-btn" onclick="openTab('losers', this)">Losers</button>
+        <button class="tab-btn" onclick="openTab('socials', this)">Socials</button>
+        <button class="tab-btn" onclick="openTab('extra', this)">Extra</button>
+      </div>
+
+      <!-- LEADERBOARD TAB -->
+      <div id="leaderboard" class="tab-content active">
+        <div class="section-card">
+          <h2 class="section-title">🏆 Larp Leaderboard</h2>
+
+          <!-- TOP 3 PODIUM -->
+          <div class="podium" id="podiumContainer"></div>
+
+          <!-- SEARCH -->
+          <div class="search-row">
+            <input
+              type="text"
+              class="search-input"
+              id="searchInput"
+              placeholder="Search the leaderboard..."
+              oninput="renderLeaderboard()"
+            />
+          </div>
+
+          <!-- LEADERBOARD -->
+          <div class="leaderboard-box" id="leaderboardList"></div>
+
+          <!-- ADMIN PANEL -->
+          <div class="admin-panel" id="adminSection">
+            <div class="admin-title">⚙️ Admin Panel</div>
+
+            <div class="admin-grid">
+              <input type="text" id="nameInput" class="admin-input" placeholder="Name" />
+              <input type="number" id="scoreInput" class="admin-input" placeholder="Score" />
+            </div>
+
+            <textarea id="noteInput" class="admin-textarea" placeholder="Short note / description"></textarea>
+
+            <div class="search-row">
+              <button class="glow-btn" onclick="addEntry()">➕ Add New Entry</button>
+              <button class="glow-btn" onclick="resetBoard()">🔄 Reset Default Board</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LOSERS TAB -->
+      <div id="losers" class="tab-content">
+        <div class="section-card">
+          <h2 class="section-title">💀 Certified Losers</h2>
+
+          <div class="info-grid">
+            <div class="info-box">
+              <h3>Worst of the Worst</h3>
+              <p>These are the people who took the biggest Ls this week.</p>
+              <ul>
+                <li>Father Runic</li>
+                <li>none</li>
+                <li>none</li>
+                <li>none</li>
+              </ul>
+            </div>
+
+            <div class="info-box">
+              <h3>Biggest Crashouts</h3>
+              <p>People who could not handle getting exposed.</p>
+              <ul>
+                <li>Repping 5 dif com groups, and AE while ext 💀</li>
+                <li>none</li>
+                <li>none</li>
+                <li>none</li>
+              </ul>
+            </div>
+
+            <div class="info-box">
+              <h3>Why They’re Here</h3>
+              <p>Too much talking, not enough proving. Hall of shame behavior.</p>
+            </div>
+
+            <div class="info-box">
+              <h3>Crashout Tracker</h3>
+              <p>Updated every time someone says “pull up” and never actually does.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SOCIALS TAB -->
+      <div id="socials" class="tab-content">
+        <div class="section-card">
+          <h2 class="section-title">📱 Socials</h2>
+
+          <div class="info-grid">
+            <div class="info-box">
+              <h3>Discord</h3>
+              <p><a href="#">idk when</a></p>
+            </div>
+
+            <div class="info-box">
+              <h3>TikTok</h3>
+              <p><a href="#">@ak74.lol</a></p>
+              <p><a href="#">@ak74iscoolio</a></p>
+            </div>
+
+            <div class="info-box">
+              <h3>YouTube</h3>
+              <p><a href="#">idk when</a></p>
+            </div>
+
+            <div class="info-box">
+              <h3>Instagram</h3>
+              <p><a href="#">idk when</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXTRA TAB -->
+      <div id="extra" class="tab-content">
+        <div class="section-card">
+          <h2 class="section-title">✨ Extra</h2>
+
+          <div class="info-grid">
+            <div class="info-box">
+              <h3>About</h3>
+              <p>This site tracks top larps, major frauds, and all-time elite nonsense.</p>
+            </div>
+
+            <div class="info-box">
+              <h3>Update Log</h3>
+              <ul>
+                <li>Added glowing cyber UI</li>
+                <li>Added scroll leaderboard</li>
+                <li>Added podium system</li>
+                <li>Added admin panel</li>
+                <li>Added animated loading screen</li>
+              </ul>
+            </div>
+
+            <div class="info-box">
+              <h3>Future Ideas</h3>
+              <ul>
+                <li>Real profile pictures</li>
+                <li>Editable loser list</li>
+                <li>Discord webhook integration</li>
+                <li>Cloud save support</li>
+              </ul>
+            </div>
+
+            <div class="info-box">
+              <h3>Website Energy</h3>
+              <p>100% glowing blue. 100% fraud detection. 0% mercy.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        © 2026 Super Cool Larps — elite larp tracking technology
+      </div>
+    </div>
+  </div>
+
+  <!-- tiny silent audio placeholder -->
+  <audio id="bgMusic" loop>
+    <source src="" type="audio/mpeg">
+  </audio>
+
+  <script>
+    // =========================
+    // DEFAULT DATA
+    // =========================
+    const defaultLeaderboard = [
+      { name: "AK74", score: 9999, note: "Exodus Larp Professional" },
+      { name: "Father Runic", score: 9450, note: "Talks crazy online, reps 5 dif com groups (AE and EXT)" },
+      { name: "Skittles", score: 9100, note: "764 Com Boss Trust" },
+      { name: "Minigun (Minigga)", score: 8888, note: "Fucking Loser!" },
+      { name: "None", score: 8600, note: "None" },
+      { name: "None", score: 8420, note: "None" },
+      { name: "None", score: 8250, note: "None" },
+      { name: "None", score: 8015, note: "None" },
+      { name: "None", score: 7900, note: "None" },
+      { name: "None", score: 7777, note: "None" },
+      { name: "None", score: 7600, note: "None" },
+      { name: "None", score: 7425, note: "None" },
+      { name: "None", score: 7300, note: "None" },
+      { name: "None", score: 7190, note: "None" },
+      { name: "None", score: 7055, note: "None" },
+      { name: "None", score: 6900, note: "None" },
+      { name: "None", score: 6750, note: "None" },
+      { name: "None", score: 6611, note: "None" },
+      { name: "None", score: 6490, note: "None" },
+      { name: "None", score: 6300, note: "None" }
+    ];
+
+    let leaderboardData = JSON.parse(localStorage.getItem("larpLeaderboard")) || [...defaultLeaderboard];
+
+    // =========================
+    // LOADER
+    // =========================
+    window.addEventListener("load", () => {
+      setTimeout(() => {
+        document.getElementById("loader").classList.add("hide");
+      }, 2500);
+    });
+
+    // =========================
+    // PARTICLES
+    // =========================
+    const particlesContainer = document.getElementById("particles");
+    for (let i = 0; i < 50; i++) {
+      const p = document.createElement("div");
+      p.className = "particle";
+      p.style.left = Math.random() * 100 + "vw";
+      p.style.animationDuration = (6 + Math.random() * 8) + "s";
+      p.style.animationDelay = Math.random() * 6 + "s";
+      p.style.opacity = Math.random();
+      p.style.transform = `scale(${0.5 + Math.random()})`;
+      particlesContainer.appendChild(p);
+    }
+
+    // =========================
+    // TABS
+    // =========================
+    function openTab(tabId, button) {
+      const tabs = document.querySelectorAll(".tab-content");
+      const buttons = document.querySelectorAll(".tab-btn");
+
+      tabs.forEach(tab => tab.classList.remove("active"));
+      buttons.forEach(btn => btn.classList.remove("active"));
+
+      document.getElementById(tabId).classList.add("active");
+      button.classList.add("active");
+    }
+
+    // =========================
+    // HELPERS
+    // =========================
+    function getInitials(name) {
+      return name
+        .split(" ")
+        .map(word => word[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase();
+    }
+
+    function saveBoard() {
+      localStorage.setItem("larpLeaderboard", JSON.stringify(leaderboardData));
+    }
+
+    function sortBoard() {
+      leaderboardData.sort((a, b) => b.score - a.score);
+    }
+
+    function updateStats() {
+      document.getElementById("statLarps").textContent = leaderboardData.length;
+    }
+
+    // =========================
+    // PODIUM
+    // =========================
+    function renderPodium() {
+      sortBoard();
+      const podiumContainer = document.getElementById("podiumContainer");
+      podiumContainer.innerHTML = "";
+
+      const top3 = leaderboardData.slice(0, 3);
+
+      top3.forEach((player, index) => {
+        const card = document.createElement("div");
+        card.className = "podium-card";
+
+        card.innerHTML = `
+          <div class="podium-rank">#${index + 1}</div>
+          <div class="avatar">${getInitials(player.name)}</div>
+          <div class="podium-name">${player.name}</div>
+          <div class="podium-note">${player.note}</div>
+          <div class="podium-score">${player.score} pts</div>
+        `;
+
+        podiumContainer.appendChild(card);
+      });
+    }
+
+    // =========================
+    // LEADERBOARD
+    // =========================
+    function renderLeaderboard() {
+      sortBoard();
+      saveBoard();
+      updateStats();
+      renderPodium();
+
+      const leaderboardList = document.getElementById("leaderboardList");
+      const searchValue = document.getElementById("searchInput").value.toLowerCase();
+
+      leaderboardList.innerHTML = "";
+
+      const filtered = leaderboardData.filter(player =>
+        player.name.toLowerCase().includes(searchValue) ||
+        player.note.toLowerCase().includes(searchValue)
+      );
+
+      filtered.forEach((player, index) => {
+        const actualRank = leaderboardData.indexOf(player) + 1;
+
+        const entry = document.createElement("div");
+        entry.className = "leaderboard-entry";
+
+        entry.innerHTML = `
+          <div class="entry-left">
+            <div class="rank">#${actualRank}</div>
+            <div class="small-avatar">${getInitials(player.name)}</div>
+            <div class="player-info">
+              <h3>${player.name}</h3>
+              <p>${player.note}</p>
+            </div>
+          </div>
+
+          <div class="entry-right">
+            <div class="score">${player.score}</div>
+            <button class="mini-btn" onclick="editEntry(${actualRank - 1})">Edit</button>
+            <button class="mini-btn danger-btn" onclick="deleteEntry(${actualRank - 1})">Delete</button>
+          </div>
+        `;
+
+        leaderboardList.appendChild(entry);
+      });
+
+      if (filtered.length === 0) {
+        leaderboardList.innerHTML = `
+          <div class="leaderboard-entry">
+            <div class="player-info">
+              <h3>No results found</h3>
+              <p>Try another search.</p>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // =========================
+    // ADMIN FUNCTIONS
+    // =========================
+    function addEntry() {
+      const name = document.getElementById("nameInput").value.trim();
+      const score = parseInt(document.getElementById("scoreInput").value);
+      const note = document.getElementById("noteInput").value.trim();
+
+      if (!name || isNaN(score) || !note) {
+        alert("Fill out Name, Score, and Note.");
+        return;
+      }
+
+      leaderboardData.push({ name, score, note });
+
+      document.getElementById("nameInput").value = "";
+      document.getElementById("scoreInput").value = "";
+      document.getElementById("noteInput").value = "";
+
+      renderLeaderboard();
+    }
+
+    function deleteEntry(index) {
+      const confirmDelete = confirm("Delete this leaderboard entry?");
+      if (!confirmDelete) return;
+
+      leaderboardData.splice(index, 1);
+      renderLeaderboard();
+    }
+
+    function editEntry(index) {
+      const player = leaderboardData[index];
+
+      const newName = prompt("Edit name:", player.name);
+      if (newName === null) return;
+
+      const newScore = prompt("Edit score:", player.score);
+      if (newScore === null) return;
+
+      const newNote = prompt("Edit note:", player.note);
+      if (newNote === null) return;
+
+      if (!newName.trim() || isNaN(parseInt(newScore)) || !newNote.trim()) {
+        alert("Invalid values.");
+        return;
+      }
+
+      leaderboardData[index] = {
+        name: newName.trim(),
+        score: parseInt(newScore),
+        note: newNote.trim()
+      };
+
+      renderLeaderboard();
+    }
+
+    function resetBoard() {
+      const confirmReset = confirm("Reset the leaderboard to default?");
+      if (!confirmReset) return;
+
+      leaderboardData = [...defaultLeaderboard];
+      renderLeaderboard();
+    }
+
+    function scrollToAdmin() {
+      document.getElementById("adminSection").scrollIntoView({ behavior: "smooth" });
+    }
+
+    // =========================
+    // FAKE LIVE STATS ANIMATION
+    // =========================
+    setInterval(() => {
+      document.getElementById("statViewers").textContent = 120 + Math.floor(Math.random() * 80);
+      document.getElementById("statCrashouts").textContent = 25 + Math.floor(Math.random() * 20);
+      document.getElementById("statFraud").textContent = 90 + Math.floor(Math.random() * 10) + "%";
+    }, 2500);
+
+    // =========================
+    // MUSIC BUTTON
+    // =========================
+    let musicOn = false;
+    function toggleMusic() {
+      // This is just a placeholder since no real music file is attached
+      musicOn = !musicOn;
+      if (musicOn) {
+        alert("Music toggle ON.\n\nIf you want real background music, I can add it for you too.");
+      } else {
+        alert("Music toggle OFF.");
+      }
+    }
+
+    // =========================
+    // START
+    // =========================
+    renderLeaderboard();
+  </script>
+</body>
+</html>
